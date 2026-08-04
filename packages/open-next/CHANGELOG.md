@@ -1,5 +1,32 @@
 # open-next
 
+## 4.1.1
+
+### Patch Changes
+
+- [#1195](https://github.com/opennextjs/opennextjs-aws/pull/1195) [`eb04b808731abdab6ed5c8dd30f0eb3b17355336`](https://github.com/opennextjs/opennextjs-aws/commit/eb04b808731abdab6ed5c8dd30f0eb3b17355336) Thanks [@JiahaoZhu11](https://github.com/JiahaoZhu11)! - Fix `server/instrumentation.js does not exist` build failure on Next.js 16
+
+  On Next.js 16 the standalone output no longer copies `server/instrumentation.js`
+  into the standalone directory, but `copyTracedFiles` copies the instrumentation
+  `.nft.json` trace and then asserts the `.js` file exists in the standalone dir,
+  throwing `File server/instrumentation.js does not exist` during the server
+  bundle. The instrumentation file is now copied from the build dir into the
+  standalone dir (mirroring the existing `.nft.json` copy) so the assertion passes
+  and the file ships in the bundle.
+
+- [#1207](https://github.com/opennextjs/opennextjs-aws/pull/1207) [`33422799811e281a0882f2be24264730ae68fff0`](https://github.com/opennextjs/opennextjs-aws/commit/33422799811e281a0882f2be24264730ae68fff0) Thanks [@conico974](https://github.com/conico974)! - Fix stale entries being revalidated in a blocking way on Next.js 16.3
+
+  To flag a cache entry as stale, the incremental cache adapter reported a
+  `lastModified` of `1` (i.e. right after the epoch) to Next.js. Starting with
+  Next.js 16.3 the incremental cache also compares `lastModified + expire` to now
+  and forces a blocking revalidation (`x-nextjs-cache: REVALIDATED`) when that is
+  in the past, which an epoch based value always is. Stale entries were therefore
+  never served while revalidating in the background.
+
+  On Next.js 16.3 and above, stale entries now report a `lastModified` just past
+  their revalidate window, so they stay inside their expire window and are served
+  stale as intended. Earlier versions keep the previous behaviour.
+
 ## 4.1.0
 
 ### Minor Changes
